@@ -63,8 +63,8 @@ tbl_corr <- train %>%
     filter(set=="train") %>%
     select_if(is.numeric) %>%
     cor(use="complete.obs") %>%
-    corrplot.mixed(tl.cex=0.85)
-
+    corrplot.mixed(tl.cex=0.85) 
+ ###
 train %>%
     mutate_all(as.numeric) %>%
     select(everything()) %>%
