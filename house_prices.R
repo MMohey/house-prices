@@ -12,17 +12,18 @@ library(GGally)
 
 train <- read_csv("train.csv")
 test <- read_csv("test.csv")
+full <- bind_rows(train, test)
 
-str(train)
+str(full)
 
 # To check for missing values
-sapply(train, function(x) sum(is.na(x) | x ==""))
+sapply(full, function(x) sum(is.na(x) | x ==""))
 
 # Unique values per column
-sapply(train, function(x) length(unique(x))) 
+sapply(full, function(x) length(unique(x))) 
 
 
-missing_values <- train %>% summarize_all(funs(sum(is.na(.))/n()))
+missing_values <- full %>% summarize_all(funs(sum(is.na(.))/n()))
 
 missing_values <- gather(missing_values, key="feature", value="missing_pct")
 missing_values %>% 
@@ -32,7 +33,7 @@ missing_values %>%
 
 setdiff(names(train), names(test)) 
 
-train %>% map_dbl(~sum(is.na(.)))
+full %>% map_dbl(~sum(is.na(.)))
 
 
 checkColumn = function(df,colname){
@@ -59,13 +60,13 @@ checkAllCols = function(df){
 
 datatable(checkAllCols(train), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
 
-tbl_corr <- train %>%
+tbl_corr <- full %>%
     filter(set=="train") %>%
     select_if(is.numeric) %>%
     cor(use="complete.obs") %>%
-    corrplot.mixed(tl.cex=0.85) 
- ###
-train %>%
+    corrplot.mixed(tl.cex=0.85)
+
+full %>%
     mutate_all(as.numeric) %>%
     select(everything()) %>%
     ggcorr(method = c("pairwise","spearman"), label = FALSE, angle = -0, hjust = 0.2) +
