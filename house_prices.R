@@ -8,14 +8,17 @@ library(stringr)
 library(readr)
 library(data.table)
 library(GGally)
+library(caret)
 
 
-train <- read_csv("train.csv")
-test <- read_csv("test.csv")
-full <- bind_rows(train, test)
+raw_train <- read_csv("train.csv")
+raw_test <- read_csv("test.csv")
+full <- bind_rows(raw_train, raw_test)
+
+length(unique(full$Id)) == length(full$Id) ## check no duped entries
 
 str(full)
-
+summary(full)
 # To check for missing values
 sapply(full, function(x) sum(is.na(x) | x ==""))
 
@@ -33,7 +36,7 @@ missing_values %>%
 
 setdiff(names(train), names(test)) 
 
-full %>% map_dbl(~sum(is.na(.)))
+#full %>% map_dbl(~sum(is.na(.)))
 
 
 checkColumn = function(df,colname){
@@ -58,16 +61,30 @@ checkAllCols = function(df){
 }
 
 
-datatable(checkAllCols(train), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
-
-tbl_corr <- full %>%
-    filter(set=="train") %>%
-    select_if(is.numeric) %>%
-    cor(use="complete.obs") %>%
-    corrplot.mixed(tl.cex=0.85)
-
+#datatable(checkAllCols(train), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
+# ###
+# tbl_corr <- full %>%
+#     filter(set=="train") %>%
+#     select_if(is.numeric) %>%
+#     cor(use="complete.obs") %>%
+#     corrplot.mixed(tl.cex=0.85)
+# ###
 full %>%
     mutate_all(as.numeric) %>%
     select(everything()) %>%
     ggcorr(method = c("pairwise","spearman"), label = FALSE, angle = -0, hjust = 0.2) +
     coord_flip()
+
+
+
+### Model Fitting
+
+full_train <- full[1:1460,]
+full_test <- full[1461:2919,]
+set.seed(123)
+inTrain <- createDataPartition(y=full_train$SalePrice, p=0.75, list = FALSE)
+train <- full_train[inTrain,]
+test <- full_train[-inTrain,]
+
+set.seed(123)
+logreg <- ran
