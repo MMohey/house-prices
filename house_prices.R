@@ -35,9 +35,9 @@ summary(full)
 sapply(full, function(x) sum(is.na(x) | x ==""))
 
 # Histograg plot for the response var
-ggplot(full[!is.na(full$SalePrice),],aes(x=SalePrice) ) 
-+ geom_histogram(bins = 50) 
-+ scale_x_continuous(breaks = seq( 0, max(full$SalePrice,na.rm = TRUE), 
+ggplot(full[!is.na(full$SalePrice),],aes(x=SalePrice) ) +
+    geom_histogram(bins = 50) +
+    scale_x_continuous(breaks = seq( 0, max(full$SalePrice,na.rm = TRUE), 
                                      by = 100000), labels = comma)
 
 # Separating Numeric and Char vars
@@ -54,16 +54,17 @@ corrplot.mixed(high_cor_mat, tl.col="black", tl.pos = "lt")
 
 
 # Plot cor between highest two vars vs SalePrice
-ggplot(full[!is.na(full$SalePrice), ],aes(x=factor(OverfullQual), y= SalePrice))
-+ geom_boxplot(col = 'blue') 
-+ scale_y_continuous(breaks = seq(0,800000, by = 100000), labels = comma)
+ggplot(full[!is.na(full$SalePrice), ],aes(x=factor(OverallQual), 
+                                          y= SalePrice))+
+    geom_boxplot(col = 'blue') +
+    scale_y_continuous(breaks = seq(0,800000, by = 100000), labels = comma)
 
 
-ggplot(data=full[!is.na(full$SalePrice),], aes(x=GrLivArea, y=SalePrice))
-+ geom_point(col='blue') 
-+ geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) 
-+ scale_y_continuous(breaks= seq(0, 800000, by=100000), labels = comma) 
-+ geom_text_repel(aes(label = ifelse
+ggplot(data=full[!is.na(full$SalePrice),], aes(x=GrLivArea, y=SalePrice))+
+    geom_point(col='blue') +
+    geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
+    scale_y_continuous(breaks= seq(0, 800000, by=100000), labels = comma) +
+    geom_text_repel(aes(label = ifelse
                       (full$GrLivArea[!is.na(full$SalePrice)]>4500,
                           rownames(full), '')))
 # # Unique values per column
