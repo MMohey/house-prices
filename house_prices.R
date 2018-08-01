@@ -24,7 +24,7 @@ str(test_raw)
 
 test_raw$SalePrice <- NA
 full <- bind_rows(train_raw, test_raw)
-length(unique(full$Id)) == length(full$Id) ## check no duped entries
+length(unique(full$Id)) == length(full$Id) ## check no duplicate entries
 
 test_Id <- test_raw$Id
 
@@ -32,9 +32,9 @@ full$Id <- NULL
 
 summary(full)
 # To check for missing values
-sapply(full, function(x) sum(is.na(x) | x ==""))
+hhh <- sapply(full, function(x) sum(is.na(x) | x ==""))
 
-# Histograg plot for the response var
+# Historam plot for the response var
 ggplot(full[!is.na(full$SalePrice),],aes(x=SalePrice) ) +
     geom_histogram(bins = 50) +
     scale_x_continuous(breaks = seq( 0, max(full$SalePrice,na.rm = TRUE), 
@@ -67,6 +67,13 @@ ggplot(data=full[!is.na(full$SalePrice),], aes(x=GrLivArea, y=SalePrice))+
     geom_text_repel(aes(label = ifelse
                       (full$GrLivArea[!is.na(full$SalePrice)]>4500,
                           rownames(full), '')))
+
+
+# Recalling which vars has missing values
+missing_var <- sapply(full, function(x) sum(is.na(x) | x == ""))
+missing_var <- sort(missing_var[missing_var>0], decreasing= TRUE)
+missing_var
+
 # # Unique values per column
 # sapply(full, function(x) length(unique(x))) 
 # 
@@ -84,42 +91,58 @@ ggplot(data=full[!is.na(full$SalePrice),], aes(x=GrLivArea, y=SalePrice))+
 #full %>% map_dbl(~sum(is.na(.)))
 
 
-checkColumn = function(df,colname){
-    
-    testData = df[[colname]]
-    numMissing = max(sum(is.na(testData)|is.nan(testData)|testData==''),0)
-    
-    
-    if (class(testData) == 'numeric' | class(testData) == 'Date' | class(testData) == 'difftime' | class(testData) == 'integer'){
-        list('col' = colname,'class' = class(testData), 'num' = length(testData) - numMissing, 'numMissing' = numMissing, 'numInfinite' = sum(is.infinite(testData)), 'avgVal' = mean(testData,na.rm=TRUE), 'minVal' = round(min(testData,na.rm = TRUE)), 'maxVal' = round(max(testData,na.rm = TRUE)))
-    } else{
-        list('col' = colname,'class' = class(testData), 'num' = length(testData) - numMissing, 'numMissing' = numMissing, 'numInfinite' = NA,  'avgVal' = NA, 'minVal' = NA, 'maxVal' = NA)
-    }
-    
-}
-checkAllCols = function(df){
-    resDF = data.frame()
-    for (colName in names(df)){
-        resDF = rbind(resDF,as.data.frame(checkColumn(df=df,colname=colName)))
-    }
-    resDF
-}
-
-
-#datatable(checkAllCols(train), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
-# ###
-# tbl_corr <- full %>%
-#     filter(set=="train") %>%
-#     select_if(is.numeric) %>%
-#     cor(use="complete.obs") %>%
-#     corrplot.mixed(tl.cex=0.85)
-# ###
-full %>%
-    mutate_all(as.numeric) %>%
-    select(everything()) %>%
-    ggcorr(method = c("pairwise","spearman"), label = FALSE, angle = -0, hjust = 0.2) +
-    coord_flip()
-
+# checkColumn = function(df,colname){
+#     
+#     testData = df[[colname]]
+#     numMissing = max(sum(is.na(testData)|is.nan(testData)|testData==''),0)
+#     
+#     
+#     if (class(testData) == 'numeric' | class(testData) == 'Date' |
+#         class(testData) == 'difftime' | class(testData) == 'integer'){
+#         list('col' = colname,'class' = class(testData), 
+#              'num' = length(testData) - numMissing, 
+#              'numMissing' = numMissing, 
+#              'numInfinite' = sum(is.infinite(testData)), 
+#              'avgVal' = mean(testData,na.rm=TRUE), 
+#              'minVal' = round(min(testData,na.rm = TRUE)), 
+#              'maxVal' = round(max(testData,na.rm = TRUE)))
+#     } else{
+#         list('col' = colname,
+#              'class' = class(testData), 
+#              'num' = length(testData) - numMissing, 
+#              'numMissing' = numMissing, 
+#              'numInfinite' = NA,  
+#              'avgVal' = NA, 
+#              'minVal' = NA, 
+#              'maxVal' = NA)
+#     }
+#     
+# }
+# checkAllCols = function(df){
+#     resDF = data.frame()
+#     for (colName in names(df)){
+#         resDF = rbind(resDF,as.data.frame(checkColumn(df=df,colname=colName)))
+#     }
+#     resDF
+# }
+# 
+# 
+# #datatable(checkAllCols(train), style="bootstrap", class="table-condensed",
+# # options = list(dom = 'tp',scrollX = TRUE))
+# # ###
+# # tbl_corr <- full %>%
+# #     filter(set=="train") %>%
+# #     select_if(is.numeric) %>%
+# #     cor(use="complete.obs") %>%
+# #     corrplot.mixed(tl.cex=0.85)
+# # ###
+# full %>%
+#     mutate_all(as.numeric) %>%
+#     select(everything()) %>%
+#     ggcorr(method = c("pairwise","spearman"), label = FALSE, angle = -0, 
+#            hjust = 0.2) +
+#     coord_flip()
+# 
 
 
 ### Model Fitting
