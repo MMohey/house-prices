@@ -13,6 +13,7 @@ library(gridExtra)
 library(scales)
 library(corrplot)
 library(ggrepel)
+library(plyr)
 
 
 train_raw <- read_csv("train.csv")
@@ -74,6 +75,30 @@ missing_var <- sapply(full, function(x) sum(is.na(x) | x == ""))
 missing_var <- sort(missing_var[missing_var>0], decreasing= TRUE)
 missing_var
 
+# Starting with the var of most missing values till var with the least missing 
+# values
+# 
+# since PoolQC: Pool quality
+# Ex	Excellent
+# Gd	Good
+# TA	Average/Typical
+# Fa	Fair
+# NA	No Pool 
+# 
+# It is obvious that the values of this var is ordinal, so it is fair to assign
+# ordinal values to each of the values here. But first, I will have to replace
+# each NA value with a string No_Pool
+# 
+full$PoolQC[is.na(full$PoolQC)] <- "No_Pool"
+ordinal_val <- c("No_Pool" = 0, "Fa" = 1, "TA" = 2, "Gd" = 3,"Ex" = 4, "Po" = 5)
+full$PoolQC <- as.integer(revalue(full$PoolQC, ordinal_val))
+
+all$PoolQC[is.na(all$PoolQC)] <- 'None'
+Qualities <- c('None' = 0, 'Po' = 1, 'Fa' = 2, 'TA' = 3, 'Gd' = 4, 'Ex' = 5)
+all$PoolQC<-as.integer(revalue(all$PoolQC, Qualities))
+
+
+TRY USING MICE TO IMPUTE MISSING DATA LOOK FOR A KERNEL THAT USED IT
 # # Unique values per column
 # sapply(full, function(x) length(unique(x))) 
 # 
